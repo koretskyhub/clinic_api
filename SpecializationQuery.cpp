@@ -7,18 +7,21 @@
 using namespace std;
 
 cppcms::json::value SpecializationQuery::getAllSpecializations() {
-    try{
-        std::string queryString;
+    try {
+        sql::ResultSet *queryResult;
+        string queryString;
         queryString.append("select * from specialization;");
-        res = stmt->executeQuery(queryString);
+        queryResult = stmt->executeQuery(queryString);
         int count = 0;
         cppcms::json::value jsonResponse;
-        while(res->next()){
-            jsonResponse["specialization"][count]["specialization_id"] = std::string(res->getString("id"));
-            jsonResponse["specialization"][count]["specialization_name"] = std::string(res->getString("spec_name"));
+        auto &subJson = jsonResponse["specialization"][count];
+        while (queryResult->next()) {
+            subJson["specialization_id"] =      string(queryResult->getString("id"));
+            subJson["specialization_name"] =    string(queryResult->getString("spec_name"));
             count++;
         }
         jsonResponse["count"] = count;
+        delete queryResult;
         return jsonResponse;
 
     } catch (sql::SQLException &e) {

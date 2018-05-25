@@ -7,9 +7,9 @@
 
 #include "dbQuery.h"
 
-class PositionQuery: public dbQuery {
+class PositionQuery : public dbQuery {
 public:
-    cppcms::json::value getPosBySpec(std::string id);
+    cppcms::json::value getPosBySpec(const string id);
 };
 
 

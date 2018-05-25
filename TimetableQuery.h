@@ -7,10 +7,11 @@
 
 #include "dbQuery.h"
 
-class TimetableQuery: public dbQuery {
+class TimetableQuery : public dbQuery {
 public:
-    cppcms::json::value specialistsByDate(std::string date, std::string specId);
-    void createAppointment(std::string dateTimeId, std::string medcardId);
+    cppcms::json::value specialistsByDate(string date, string specId);
+
+    void createAppointment(string dateTimeId, string medcardId);
 };
 
 

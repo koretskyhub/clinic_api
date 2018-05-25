@@ -6,23 +6,26 @@
 
 using namespace std;
 
-cppcms::json::value SpecialistQuery::getSecialistsByPos(std::string id) {
-    try{
-        std::string queryString;
+cppcms::json::value SpecialistQuery::getSecialistsByPos(string id) {
+    try {
+        sql::ResultSet *queryResult;
+        string queryString;
         queryString.append("select * from expert where expert.pos_id_fk = ");
         queryString.append(id);
         queryString.append(";");
-        res = stmt->executeQuery(queryString);
+        queryResult = stmt->executeQuery(queryString);
         int count = 0;
         cppcms::json::value jsonResponse;
-        while(res->next()){
-            jsonResponse["specialists"][count]["specialists_id"] = std::stoi(std::string(res->getString("id")));
-            jsonResponse["specialists"][count]["first_name"] = std::string(res->getString("first_name"));
-            jsonResponse["specialists"][count]["second_name"] = std::string(res->getString("second_name"));
-            jsonResponse["specialists"][count]["middle_name"] = std::string(res->getString("middle_name"));
+        auto &subJson = jsonResponse["specialists"][count];
+        while (queryResult->next()) {
+            subJson["specialists_id"] = stoi(string(queryResult->getString("id")));
+            subJson["first_name"] =     string(queryResult->getString("first_name"));
+            subJson["second_name"] =    string(queryResult->getString("second_name"));
+            subJson["middle_name"] =    string(queryResult->getString("middle_name"));
             count++;
         }
         jsonResponse["count"] = count;
+        delete queryResult;
         return jsonResponse;
 
     } catch (sql::SQLException &e) {

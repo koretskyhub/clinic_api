@@ -7,12 +7,12 @@
 
 #include "dbQuery.h"
 
-class SurveyQuery: dbQuery {
+class SurveyQuery : dbQuery {
 public:
 
-    void createSurveyRecord(cppcms::json::value &newRecord, std::string sid);
+    void createSurveyRecord(cppcms::json::value &newRecord, string sid);
 
-    cppcms::json::value getSurveyRecord(std::string medcardId, std::string page);
+    cppcms::json::value getSurveyRecord(string medcardId, string page);
 };
 
 

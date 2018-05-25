@@ -4,23 +4,24 @@
 
 #include "PositionQuery.h"
 
-using namespace std;
-
-cppcms::json::value PositionQuery::getPosBySpec(std::string id) {
-    try{
-        std::string queryString;
+cppcms::json::value PositionQuery::getPosBySpec(const string id) {
+    try {
+        sql::ResultSet *queryResult;
+        string queryString;
         queryString.append("select * from position where position.spec_id_fk = ");
         queryString.append(id);
         queryString.append(";");
-        res = stmt->executeQuery(queryString);
+        queryResult = stmt->executeQuery(queryString);
         int count = 0;
         cppcms::json::value jsonResponse;
-        while(res->next()){
-            jsonResponse["position"][count]["position_id"] = std::string(res->getString("id"));
-            jsonResponse["position"][count]["position_name"] = std::string(res->getString("pos_name"));
+        auto &subJson = jsonResponse["position"][count];
+        while (queryResult->next()) {
+            subJson["position_id"] =   string(queryResult->getString("id"));
+            subJson["position_name"] = string(queryResult->getString("pos_name"));
             count++;
         }
         jsonResponse["count"] = count;
+        delete queryResult;
         return jsonResponse;
 
     } catch (sql::SQLException &e) {

@@ -7,20 +7,20 @@
 
 #include "dbQuery.h"
 
-class SessionQuery: public dbQuery {
+class SessionQuery : public dbQuery {
 public:
 
-    bool authentificate(std::string login, std::string password);
+    bool authentificate(string login, string password);
 
-    bool checkSession(std::string login, std::string password);
+    bool checkSession(string login, string password);
 
-    void createSession(std::string login, std::string password, std::string sid);
+    void createSession(string login, string password, string sid);
 
-    void deleteSession(std::string sid);
+    void deleteSession(string sid);
 
-    bool isDoctor(std::string sid);
+    bool isDoctor(string sid);
 
-    bool isReceptionist(std::string sid);
+    bool isReceptionist(string sid);
 };
 
 

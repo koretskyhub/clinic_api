@@ -4,20 +4,20 @@
 
 #include "SessionQuery.h"
 
-using namespace std;
-
-bool SessionQuery::authentificate(std::string login, std::string password) {
-    try{
-        std::string queryString;
+bool SessionQuery::authentificate(string login, string password) {
+    try {
+        sql::ResultSet *queryResult;
+        string queryString;
         queryString.append("select* from user where login = '");
         queryString.append(login);
         queryString.append("' and password = '");
         queryString.append(password);
         queryString.append("';");
 
-        res = stmt->executeQuery(queryString);
+        queryResult = stmt->executeQuery(queryString);
         bool result = false;
-        if(res->next()) result = true;
+        if (queryResult->next()) result = true;
+        delete queryResult;
         return result;
 
     } catch (sql::SQLException &e) {
@@ -29,9 +29,9 @@ bool SessionQuery::authentificate(std::string login, std::string password) {
     }
 }
 
-void SessionQuery::createSession(std::string login, std::string password, std::string sid) {
-    try{
-        std::string queryString;
+void SessionQuery::createSession(string login, string password, string sid) {
+    try {
+        string queryString;
         queryString.append("insert into session values (null, (select id from user where login = '");
         queryString.append(login);
         queryString.append("' and password='");
@@ -40,7 +40,7 @@ void SessionQuery::createSession(std::string login, std::string password, std::s
         queryString.append(sid);
         queryString.append("');");
 
-        res = reinterpret_cast<sql::ResultSet *>(stmt->execute(queryString));
+        stmt->execute(queryString);
 
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;
@@ -51,14 +51,14 @@ void SessionQuery::createSession(std::string login, std::string password, std::s
     }
 }
 
-void SessionQuery::deleteSession(std::string sid) {
-    try{
-        std::string queryString;
+void SessionQuery::deleteSession(string sid) {
+    try {
+        string queryString;
         queryString.append("delete from  session where session_id = '");
         queryString.append(sid);
         queryString.append("';");
 
-        res = reinterpret_cast<sql::ResultSet *>(stmt->execute(queryString));
+        stmt->execute(queryString);
 
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;
@@ -69,18 +69,20 @@ void SessionQuery::deleteSession(std::string sid) {
     }
 }
 
-bool SessionQuery::checkSession(std::string login, std::string password) {
-    try{
-        std::string queryString;
+bool SessionQuery::checkSession(string login, string password) {
+    try {
+        sql::ResultSet *queryResult;
+        string queryString;
         queryString.append("select * from session where user_id_fk in ( select id from user where login = '");
         queryString.append(login);
         queryString.append("' and password = '");
         queryString.append(password);
         queryString.append("');");
 
-        res = stmt->executeQuery(queryString);
+        queryResult = stmt->executeQuery(queryString);
         bool result = true;
-        if(res->next()) result = false;
+        if (queryResult->next()) result = false;
+        delete queryResult;
         return result;
 
     } catch (sql::SQLException &e) {
@@ -92,19 +94,18 @@ bool SessionQuery::checkSession(std::string login, std::string password) {
     }
 }
 
-bool SessionQuery::isDoctor(std::string sid) {
-    try{
-
-        //select * from user where id in (select user_id_fk from session where session_id = 'k9VY_zhqb1nU_bbYRIDIEsTdb+gSqy_K') and expert_id_fk is not null;
-
-        std::string queryString;
+bool SessionQuery::isDoctor(string sid) {
+    try {
+        sql::ResultSet *queryResult;
+        string queryString;
         queryString.append("select * from user where id in (select user_id_fk from session where session_id = '");
         queryString.append(sid);
         queryString.append("') and expert_id_fk is not null;");
 
-        res = stmt->executeQuery(queryString);
+        queryResult = stmt->executeQuery(queryString);
         bool result = false;
-        if(res->next()) result = true;
+        if (queryResult->next()) result = true;
+        delete queryResult;
         return result;
 
     } catch (sql::SQLException &e) {
@@ -116,19 +117,18 @@ bool SessionQuery::isDoctor(std::string sid) {
     }
 }
 
-bool SessionQuery::isReceptionist(std::string sid) {
-    try{
-
-        //select * from user where id in (select user_id_fk from session where session_id = 'k9VY_zhqb1nU_bbYRIDIEsTdb+gSqy_K') and expert_id_fk is not null;
-
-        std::string queryString;
+bool SessionQuery::isReceptionist(string sid) {
+    try {
+        sql::ResultSet *queryResult;
+        string queryString;
         queryString.append("select * from user where id in (select user_id_fk from session where session_id = '");
         queryString.append(sid);
         queryString.append("') and expert_id_fk is null;");
 
-        res = stmt->executeQuery(queryString);
+        queryResult = stmt->executeQuery(queryString);
         bool result = false;
-        if(res->next()) result = true;
+        if (queryResult->next()) result = true;
+        delete queryResult;
         return result;
 
     } catch (sql::SQLException &e) {

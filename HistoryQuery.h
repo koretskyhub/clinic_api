@@ -7,12 +7,11 @@
 
 #include "dbQuery.h"
 
-class HistoryQuery: dbQuery {
+class HistoryQuery : dbQuery {
 public:
 
-    void createHistoryRecord(cppcms::json::value &newRecord, std::string sid);
-
-    cppcms::json::value getHistoryRecord(std::string medcardId, std::string page);
+    void createHistoryRecord(const cppcms::json::value &newRecord, const string sid);
+    cppcms::json::value getHistoryRecord(const string medcardId, const string page);
 };
 
 

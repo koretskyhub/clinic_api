@@ -7,9 +7,9 @@
 
 #include "dbQuery.h"
 
-class SpecialistQuery: public dbQuery {
+class SpecialistQuery : public dbQuery {
 public:
-    cppcms::json::value getSecialistsByPos(std::string id);
+    cppcms::json::value getSecialistsByPos(string id);
 };
 
 

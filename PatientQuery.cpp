@@ -4,11 +4,10 @@
 
 #include "PatientQuery.h"
 
-using namespace std;
+bool PatientQuery::createPatient(const cppcms::json::value &newPatient) {
+    try {
 
-bool PatientQuery::createPatient(cppcms::json::value &newPatient) {
-    try{
-        std::string queryString;
+        string queryString;
         queryString.append("insert into medcard values (null, '");
         queryString.append(newPatient["second_name"].str());
         queryString.append("', '");
@@ -25,8 +24,7 @@ bool PatientQuery::createPatient(cppcms::json::value &newPatient) {
         queryString.append(newPatient["address"].str());
         queryString.append("');");
 
-
-        res = reinterpret_cast<sql::ResultSet *>(stmt->execute(queryString));
+        stmt->execute(queryString);
 
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;
@@ -37,24 +35,26 @@ bool PatientQuery::createPatient(cppcms::json::value &newPatient) {
     }
 };
 
-cppcms::json::value PatientQuery::getPatientBySecondName(std::string secondName) {
-    try{
-        std::string queryString;
+cppcms::json::value PatientQuery::getPatientBySecondName(const string secondName) {
+    try {
+        sql::ResultSet *queryResult;
+        string queryString;
         queryString.append("select * from medcard where second_name like '%");
         queryString.append(secondName);
         queryString.append("%';");
-
-        res = stmt->executeQuery(queryString);
+        queryResult = stmt->executeQuery(queryString);
         int count = 0;
         cppcms::json::value jsonResponse;
-        while(res->next()){
-            jsonResponse["patients"][count]["medcard_id"] = std::string(res->getString("id"));
-            jsonResponse["patients"][count]["first_name"] = std::string(res->getString("first_name"));
-            jsonResponse["patients"][count]["second_name"] = std::string(res->getString("second_name"));
-            jsonResponse["patients"][count]["middle_name"] = std::string(res->getString("middle_name"));
+        auto &subJson = jsonResponse["patients"][count];
+        while (queryResult->next()) {
+            subJson["medcard_id"] =  string(queryResult->getString("id"));
+            subJson["first_name"] =  string(queryResult->getString("first_name"));
+            subJson["second_name"] = string(queryResult->getString("second_name"));
+            subJson["middle_name"] = string(queryResult->getString("middle_name"));
             count++;
         }
         jsonResponse["count"] = count;
+        delete queryResult;
         return jsonResponse;
 
     } catch (sql::SQLException &e) {
@@ -66,28 +66,29 @@ cppcms::json::value PatientQuery::getPatientBySecondName(std::string secondName)
     }
 }
 
-cppcms::json::value PatientQuery::getPatientById(std::string id) {
+cppcms::json::value PatientQuery::getPatientById(const string id) {
 
-    try{
-        std::string queryString;
+    try {
+        sql::ResultSet *queryResult;
+        string queryString;
         queryString.append("select id, second_name, first_name, middle_name,"
                                    " medical_policy, date_format(birthday, '%d.%m.%Y') as birthday,"
                                    " telephone, address from medcard where id = ");
         queryString.append(id);
         queryString.append(";");
-
-        res = stmt->executeQuery(queryString);
+        queryResult = stmt->executeQuery(queryString);
         cppcms::json::value jsonResponse;
-        if(res->next()){
-            jsonResponse["medcard_id"] = std::string(res->getString("id"));
-            jsonResponse["first_name"] = std::string(res->getString("first_name"));
-            jsonResponse["second_name"] = std::string(res->getString("second_name"));
-            jsonResponse["middle_name"] = std::string(res->getString("middle_name"));
-            jsonResponse["number_of_police"] = std::string(res->getString("medical_policy"));
-            jsonResponse["birthday"] = std::string(res->getString("birthday"));
-            jsonResponse["address"] = std::string(res->getString("address"));
-            jsonResponse["telephone"] = std::string(res->getString("telephone"));
+        if (queryResult->next()) {
+            jsonResponse["medcard_id"] =        string(queryResult->getString("id"));
+            jsonResponse["first_name"] =        string(queryResult->getString("first_name"));
+            jsonResponse["second_name"] =       string(queryResult->getString("second_name"));
+            jsonResponse["middle_name"] =       string(queryResult->getString("middle_name"));
+            jsonResponse["number_of_police"] =  string(queryResult->getString("medical_policy"));
+            jsonResponse["birthday"] =          string(queryResult->getString("birthday"));
+            jsonResponse["address"] =           string(queryResult->getString("address"));
+            jsonResponse["telephone"] =         string(queryResult->getString("telephone"));
         }
+        delete queryResult;
         return jsonResponse;
 
     } catch (sql::SQLException &e) {
@@ -99,10 +100,10 @@ cppcms::json::value PatientQuery::getPatientById(std::string id) {
     }
 }
 
-cppcms::json::value PatientQuery::todayPatients(std::string sid) {
-    try{
-
-        std::string queryString;
+cppcms::json::value PatientQuery::todayPatients(string sid) {
+    try {
+        sql::ResultSet *queryResult;
+        string queryString;
         queryString.append("select medcard_id_fk as medcard_id, first_name, second_name,"
                                    " middle_name, time(reception_datetime) as time from timetable,"
                                    " appointment, medcard where expert_id_fk"
@@ -113,18 +114,20 @@ cppcms::json::value PatientQuery::todayPatients(std::string sid) {
                                    " medcard.id = appointment.medcard_id_fk"
                                    " and date(reception_datetime) = date(now());");
 
-        res = stmt->executeQuery(queryString);
+        queryResult = stmt->executeQuery(queryString);
         int count = 0;
         cppcms::json::value jsonResponse;
-        while(res->next()){
-            jsonResponse["patients"][count]["medcard_id"] = std::string(res->getString("medcard_id"));
-            jsonResponse["patients"][count]["first_name"] = std::string(res->getString("first_name"));
-            jsonResponse["patients"][count]["second_name"] = std::string(res->getString("second_name"));
-            jsonResponse["patients"][count]["middle_name"] = std::string(res->getString("middle_name"));
-            jsonResponse["patients"][count]["time"] = std::string(res->getString("time"));
+        auto &subJson = jsonResponse["patients"][count];
+        while (queryResult->next()) {
+            subJson["medcard_id"] =     string(queryResult->getString("medcard_id"));
+            subJson["first_name"] =     string(queryResult->getString("first_name"));
+            subJson["second_name"] =    string(queryResult->getString("second_name"));
+            subJson["middle_name"] =    string(queryResult->getString("middle_name"));
+            subJson["time"] =           string(queryResult->getString("time"));
             count++;
         }
         jsonResponse["count"] = count;
+        delete queryResult;
         return jsonResponse;
 
     } catch (sql::SQLException &e) {

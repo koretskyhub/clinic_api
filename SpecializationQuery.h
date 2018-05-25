@@ -7,12 +7,12 @@
 
 #include "dbQuery.h"
 
-class SpecializationQuery: public dbQuery {
+class SpecializationQuery : public dbQuery {
 public:
 
     cppcms::json::value getAllSpecializations();
 
-    SpecializationQuery():dbQuery(){};
+    SpecializationQuery() : dbQuery() {};
 
 };
 

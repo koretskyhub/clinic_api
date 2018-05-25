@@ -8,18 +8,16 @@
 #include "dbQuery.h"
 
 
-class PatientQuery: public dbQuery{
+class PatientQuery : public dbQuery {
 public:
 
-    bool createPatient(cppcms::json::value &newPatient);
+    bool createPatient(const cppcms::json::value &newPatient);
 
-    cppcms::json::value getPatientBySecondName(std::string secondName);
+    cppcms::json::value getPatientBySecondName(const string secondName);
 
-    cppcms::json::value getPatientById(std::string id);
+    cppcms::json::value getPatientById(const string id);
 
-    cppcms::json::value todayPatients(std::string sid);
-
-    PatientQuery():dbQuery(){};
+    cppcms::json::value todayPatients(const string sid);
 
 };
 

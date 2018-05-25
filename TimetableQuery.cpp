@@ -6,26 +6,31 @@
 
 using namespace std;
 
-cppcms::json::value TimetableQuery::specialistsByDate(std::string date, std::string specId) {
+cppcms::json::value TimetableQuery::specialistsByDate(string date, string specId) {
 
-    try{
-        std::string queryString;
-        queryString.append("select id, date_format(reception_datetime, '%d.%m.%Y') as date, date_format(reception_datetime, '%T') as time "
-                                   "from timetable where id not in (select id from appointment) and expert_id_fk = ");
+    try {
+        sql::ResultSet *queryResult;
+        string queryString;
+        queryString.append("select id, date_format(reception_datetime, '%d.%m.%Y')"
+                                   " as date, date_format(reception_datetime, '%T') as time "
+                                   "from timetable where id not in (select id from appointment)"
+                                   " and expert_id_fk = ");
         queryString.append(specId);
         queryString.append(" and date(reception_datetime) = str_to_date('");
         queryString.append(date);
         queryString.append("', '%d.%m.%Y' );");
-        res = stmt->executeQuery(queryString);
+        queryResult = stmt->executeQuery(queryString);
         int count = 0;
         cppcms::json::value jsonResponse;
-        while(res->next()){
-            jsonResponse["free_place"][count]["time_id"] = std::stoi(std::string(res->getString("id")));
-            jsonResponse["free_place"][count]["date"] = std::string(res->getString("date"));
-            jsonResponse["free_place"][count]["time"] = std::string(res->getString("time"));
+        auto &subJson = jsonResponse["free_place"][count];
+        while (queryResult->next()) {
+            subJson["time_id"] =    stoi(string(queryResult->getString("id")));
+            subJson["date"] =       string(queryResult->getString("date"));
+            subJson["time"] =       string(queryResult->getString("time"));
             count++;
         }
         jsonResponse["count"] = count;
+        delete queryResult;
         return jsonResponse;
 
     } catch (sql::SQLException &e) {
@@ -37,15 +42,16 @@ cppcms::json::value TimetableQuery::specialistsByDate(std::string date, std::str
     }
 }
 
-void TimetableQuery::createAppointment(std::string dateTimeId, std::string medcardId) {
-    try{
-        std::string queryString;
+void TimetableQuery::createAppointment(string dateTimeId, string medcardId) {
+    try {
+
+        string queryString;
         queryString.append("insert into appointment values(");
         queryString.append(dateTimeId);
         queryString.append(", ");
         queryString.append(medcardId);
         queryString.append(" );");
-        res = reinterpret_cast<sql::ResultSet *>(stmt->execute(queryString));
+        stmt->execute(queryString);
 
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;

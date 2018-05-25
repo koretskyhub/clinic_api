@@ -12,16 +12,23 @@
 #include <cppconn/statement.h>
 #include <cppcms/json.h>
 
+using namespace std;
+
 class dbQuery {
 public:
     dbQuery();
+
     ~dbQuery();
 
 protected:
     sql::Driver *driver;
     sql::Connection *con;
     sql::Statement *stmt;
-    sql::ResultSet *res;
+private:
+    const string dbSchema = "clinic";
+    const string dbIP = "tcp://127.0.0.1:3306";
+    const string dbLogin = "cpp_project";
+    const string dbPswd = "00000000";
 };
 
 
