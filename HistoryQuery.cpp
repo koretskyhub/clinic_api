@@ -2,22 +2,23 @@
 // Created by mike on 17.05.18.
 //
 
+#include <sstream>
 #include "HistoryQuery.h"
 
-cppcms::json::value HistoryQuery::getHistoryRecord(const string medcardId, const string page) {
+using namespace std;
+
+cppcms::json::value HistoryQuery::getHistoryRecord(const string& medcardId, const string& page) {
     try {
-        sql::ResultSet *queryResult;
-        string queryString;
-        queryString.append("select pos_name, expert_id_fk, first_name, second_name, middle_name,"
+        stringstream queryString;
+        queryString << "select pos_name, expert_id_fk, first_name, second_name, middle_name,"
                                    " patienthood, diagnostic, assignment, date_format(receipt_date,"
                                    " '%d.%m.%Y') as date"
                                    " from history, expert, position where expert.id = history.expert_id_fk"
-                                   " and history.medcard_id_fk = ");
-        queryString.append(medcardId);
-        queryString.append(" and position.id = expert.pos_id_fk;");
-
-        queryResult = stmt->executeQuery(queryString);
-        const int pageSize = 5;
+                                   " and history.medcard_id_fk = ";
+        queryString << medcardId;
+        queryString << " and position.id = expert.pos_id_fk;";
+        shared_ptr<sql::ResultSet> queryResult(stmt->executeQuery(queryString.str()));
+        const int pageSize = 5; //Количество записей в формируемом Json-ответе, регулирует его размер
         int count = 0;
         int pageNum = stoi(page);
         int currpage = 0;
@@ -44,7 +45,7 @@ cppcms::json::value HistoryQuery::getHistoryRecord(const string medcardId, const
         jsonResponse["current_page"] = pageNum;
         jsonResponse["next_page"] = (count_pages >= pageNum) ? pageNum : pageNum + 1;
         jsonResponse["prev_page"] = (pageNum > 0) ? pageNum - 1 : pageNum;
-        delete queryResult;
+        //delete queryResult;
         return jsonResponse;
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;
@@ -55,24 +56,24 @@ cppcms::json::value HistoryQuery::getHistoryRecord(const string medcardId, const
     }
 }
 
-void HistoryQuery::createHistoryRecord(const cppcms::json::value &newRecord, const string sid) {
+void HistoryQuery::createHistoryRecord(const cppcms::json::value &newRecord, const string& sid) {
     try {
-        string queryString;
-        queryString.append("insert into history values (null, (select expert_id_fk from user,"
-                                   " session where session.session_id = '");
-        queryString.append(sid);
-        queryString.append("' and session.user_id_fk = user.id), ");
-        queryString.append(newRecord["medcard_id"].str());
-        queryString.append(", '");
-        queryString.append(newRecord["symptoms"].str());
-        queryString.append("', '");
-        queryString.append(newRecord["appointment"].str());
-        queryString.append("', '");
-        queryString.append(newRecord["diagnosis"].str());
-        queryString.append("', date(now()));");
+        stringstream queryString;
+        queryString << "insert into history values (null, (select expert_id_fk from user,"
+                                   " session where session.session_id = '";
+        queryString << sid;
+        queryString << "' and session.user_id_fk = user.id), ";
+        queryString << newRecord["medcard_id"].str();
+        queryString << ", '";
+        queryString << newRecord["symptoms"].str();
+        queryString << "', '";
+        queryString << newRecord["appointment"].str();
+        queryString << "', '";
+        queryString << newRecord["diagnosis"].str();
+        queryString << "', date(now()));";
 
 
-        stmt->execute(queryString);
+        stmt->execute(queryString.str());
 
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;

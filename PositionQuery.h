@@ -9,7 +9,7 @@
 
 class PositionQuery : public dbQuery {
 public:
-    cppcms::json::value getPosBySpec(const string id);
+    cppcms::json::value getPosBySpec(const std::string& id);
 };
 
 

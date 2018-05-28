@@ -2,18 +2,18 @@
 // Created by mike on 16.05.18.
 //
 
+#include <sstream>
 #include "SpecialistQuery.h"
 
 using namespace std;
 
-cppcms::json::value SpecialistQuery::getSecialistsByPos(string id) {
+cppcms::json::value SpecialistQuery::getSecialistsByPos(const string& id) {
     try {
-        sql::ResultSet *queryResult;
-        string queryString;
-        queryString.append("select * from expert where expert.pos_id_fk = ");
-        queryString.append(id);
-        queryString.append(";");
-        queryResult = stmt->executeQuery(queryString);
+        stringstream queryString;
+        queryString << "select * from expert where expert.pos_id_fk = ";
+        queryString << id;
+        queryString << ";";
+        shared_ptr<sql::ResultSet> queryResult(stmt->executeQuery(queryString.str()));
         int count = 0;
         cppcms::json::value jsonResponse;
         auto &subJson = jsonResponse["specialists"][count];
@@ -25,7 +25,6 @@ cppcms::json::value SpecialistQuery::getSecialistsByPos(string id) {
             count++;
         }
         jsonResponse["count"] = count;
-        delete queryResult;
         return jsonResponse;
 
     } catch (sql::SQLException &e) {

@@ -2,24 +2,24 @@
 // Created by mike on 16.05.18.
 //
 
+#include <sstream>
 #include "TimetableQuery.h"
 
 using namespace std;
 
-cppcms::json::value TimetableQuery::specialistsByDate(string date, string specId) {
+cppcms::json::value TimetableQuery::specialistsByDate(const string& date, const string& specId) {
 
     try {
-        sql::ResultSet *queryResult;
-        string queryString;
-        queryString.append("select id, date_format(reception_datetime, '%d.%m.%Y')"
+        stringstream queryString;
+        queryString << "select id, date_format(reception_datetime, '%d.%m.%Y')"
                                    " as date, date_format(reception_datetime, '%T') as time "
                                    "from timetable where id not in (select id from appointment)"
-                                   " and expert_id_fk = ");
-        queryString.append(specId);
-        queryString.append(" and date(reception_datetime) = str_to_date('");
-        queryString.append(date);
-        queryString.append("', '%d.%m.%Y' );");
-        queryResult = stmt->executeQuery(queryString);
+                                   " and expert_id_fk = ";
+        queryString << specId;
+        queryString << " and date(reception_datetime) = str_to_date('";
+        queryString << date;
+        queryString << "', '%d.%m.%Y' );";
+        shared_ptr<sql::ResultSet> queryResult(stmt->executeQuery(queryString.str()));
         int count = 0;
         cppcms::json::value jsonResponse;
         auto &subJson = jsonResponse["free_place"][count];
@@ -30,7 +30,6 @@ cppcms::json::value TimetableQuery::specialistsByDate(string date, string specId
             count++;
         }
         jsonResponse["count"] = count;
-        delete queryResult;
         return jsonResponse;
 
     } catch (sql::SQLException &e) {
@@ -42,16 +41,16 @@ cppcms::json::value TimetableQuery::specialistsByDate(string date, string specId
     }
 }
 
-void TimetableQuery::createAppointment(string dateTimeId, string medcardId) {
+void TimetableQuery::createAppointment(const string& dateTimeId, const string& medcardId) {
     try {
 
-        string queryString;
-        queryString.append("insert into appointment values(");
-        queryString.append(dateTimeId);
-        queryString.append(", ");
-        queryString.append(medcardId);
-        queryString.append(" );");
-        stmt->execute(queryString);
+        stringstream queryString;
+        queryString << "insert into appointment values(";
+        queryString << dateTimeId;
+        queryString << ", ";
+        queryString << medcardId;
+        queryString << " );";
+        stmt->execute(queryString.str());
 
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;

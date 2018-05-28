@@ -10,17 +10,17 @@
 class SessionQuery : public dbQuery {
 public:
 
-    bool authentificate(string login, string password);
+    bool authentificate(const std::string& login, const std::string& password);
 
-    bool checkSession(string login, string password);
+    bool checkSession(const std::string& login, const std::string& password);
 
-    void createSession(string login, string password, string sid);
+    void createSession(const std::string& login, const std::string& password, const std::string& sid);
 
-    void deleteSession(string sid);
+    void deleteSession(const std::string& sid);
 
-    bool isDoctor(string sid);
+    bool isDoctor(const std::string& sid);
 
-    bool isReceptionist(string sid);
+    bool isReceptionist(const std::string& sid);
 };
 
 

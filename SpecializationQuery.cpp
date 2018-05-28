@@ -2,16 +2,16 @@
 // Created by mike on 16.05.18.
 //
 
+#include <sstream>
 #include "SpecializationQuery.h"
 
 using namespace std;
 
 cppcms::json::value SpecializationQuery::getAllSpecializations() {
     try {
-        sql::ResultSet *queryResult;
-        string queryString;
-        queryString.append("select * from specialization;");
-        queryResult = stmt->executeQuery(queryString);
+        stringstream queryString;
+        queryString << "select * from specialization;";
+        shared_ptr<sql::ResultSet> queryResult(stmt->executeQuery(queryString.str()));
         int count = 0;
         cppcms::json::value jsonResponse;
         auto &subJson = jsonResponse["specialization"][count];
@@ -21,7 +21,6 @@ cppcms::json::value SpecializationQuery::getAllSpecializations() {
             count++;
         }
         jsonResponse["count"] = count;
-        delete queryResult;
         return jsonResponse;
 
     } catch (sql::SQLException &e) {

@@ -2,16 +2,18 @@
 // Created by mike on 16.05.18.
 //
 
+#include <sstream>
 #include "PositionQuery.h"
 
-cppcms::json::value PositionQuery::getPosBySpec(const string id) {
+using namespace std;
+
+cppcms::json::value PositionQuery::getPosBySpec(const string& id) {
     try {
-        sql::ResultSet *queryResult;
-        string queryString;
-        queryString.append("select * from position where position.spec_id_fk = ");
-        queryString.append(id);
-        queryString.append(";");
-        queryResult = stmt->executeQuery(queryString);
+        stringstream queryString;
+        queryString << "select * from position where position.spec_id_fk = ";
+        queryString << id;
+        queryString << ";";
+        shared_ptr<sql::ResultSet> queryResult(stmt->executeQuery(queryString.str()));
         int count = 0;
         cppcms::json::value jsonResponse;
         auto &subJson = jsonResponse["position"][count];
@@ -21,7 +23,6 @@ cppcms::json::value PositionQuery::getPosBySpec(const string id) {
             count++;
         }
         jsonResponse["count"] = count;
-        delete queryResult;
         return jsonResponse;
 
     } catch (sql::SQLException &e) {

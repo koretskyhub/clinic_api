@@ -2,22 +2,22 @@
 // Created by mike on 17.05.18.
 //
 
+#include <sstream>
 #include "SessionQuery.h"
 
-bool SessionQuery::authentificate(string login, string password) {
-    try {
-        sql::ResultSet *queryResult;
-        string queryString;
-        queryString.append("select* from user where login = '");
-        queryString.append(login);
-        queryString.append("' and password = '");
-        queryString.append(password);
-        queryString.append("';");
+using namespace std;
 
-        queryResult = stmt->executeQuery(queryString);
+bool SessionQuery::authentificate(const std::string& login, const std::string& password) {
+    try {
+        stringstream queryString;
+        queryString << "select* from user where login = '";
+        queryString << login;
+        queryString << "' and password = '";
+        queryString << password;
+        queryString << "';";
+        shared_ptr<sql::ResultSet> queryResult(stmt->executeQuery(queryString.str()));
         bool result = false;
         if (queryResult->next()) result = true;
-        delete queryResult;
         return result;
 
     } catch (sql::SQLException &e) {
@@ -29,18 +29,18 @@ bool SessionQuery::authentificate(string login, string password) {
     }
 }
 
-void SessionQuery::createSession(string login, string password, string sid) {
+void SessionQuery::createSession(const std::string& login, const std::string& password, const std::string& sid) {
     try {
-        string queryString;
-        queryString.append("insert into session values (null, (select id from user where login = '");
-        queryString.append(login);
-        queryString.append("' and password='");
-        queryString.append(password);
-        queryString.append("'), date(date_add(now(), interval 10 day)), '");
-        queryString.append(sid);
-        queryString.append("');");
+        stringstream queryString;
+        queryString << "insert into session values (null, (select id from user where login = '";
+        queryString << login;
+        queryString << "' and password='";
+        queryString << password;
+        queryString << "'), date(date_add(now(), interval 10 day)), '";
+        queryString << sid;
+        queryString << "');";
 
-        stmt->execute(queryString);
+        stmt->execute(queryString.str());
 
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;
@@ -51,14 +51,14 @@ void SessionQuery::createSession(string login, string password, string sid) {
     }
 }
 
-void SessionQuery::deleteSession(string sid) {
+void SessionQuery::deleteSession(const std::string& sid) {
     try {
-        string queryString;
-        queryString.append("delete from  session where session_id = '");
-        queryString.append(sid);
-        queryString.append("';");
+        stringstream queryString;
+        queryString << "delete from  session where session_id = '";
+        queryString << sid;
+        queryString << "';";
 
-        stmt->execute(queryString);
+        stmt->execute(queryString.str());
 
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;
@@ -69,20 +69,17 @@ void SessionQuery::deleteSession(string sid) {
     }
 }
 
-bool SessionQuery::checkSession(string login, string password) {
+bool SessionQuery::checkSession(const std::string& login, const std::string& password) {
     try {
-        sql::ResultSet *queryResult;
-        string queryString;
-        queryString.append("select * from session where user_id_fk in ( select id from user where login = '");
-        queryString.append(login);
-        queryString.append("' and password = '");
-        queryString.append(password);
-        queryString.append("');");
-
-        queryResult = stmt->executeQuery(queryString);
+        stringstream queryString;
+        queryString << "select * from session where user_id_fk in ( select id from user where login = '";
+        queryString << login;
+        queryString << "' and password = '";
+        queryString << password;
+        queryString << "');";
+        shared_ptr<sql::ResultSet> queryResult(stmt->executeQuery(queryString.str()));
         bool result = true;
         if (queryResult->next()) result = false;
-        delete queryResult;
         return result;
 
     } catch (sql::SQLException &e) {
@@ -94,18 +91,15 @@ bool SessionQuery::checkSession(string login, string password) {
     }
 }
 
-bool SessionQuery::isDoctor(string sid) {
+bool SessionQuery::isDoctor(const std::string& sid) {
     try {
-        sql::ResultSet *queryResult;
-        string queryString;
-        queryString.append("select * from user where id in (select user_id_fk from session where session_id = '");
-        queryString.append(sid);
-        queryString.append("') and expert_id_fk is not null;");
-
-        queryResult = stmt->executeQuery(queryString);
+        stringstream queryString;
+        queryString << "select * from user where id in (select user_id_fk from session where session_id = '";
+        queryString << sid;
+        queryString << "') and expert_id_fk is not null;";
+        shared_ptr<sql::ResultSet> queryResult(stmt->executeQuery(queryString.str()));
         bool result = false;
         if (queryResult->next()) result = true;
-        delete queryResult;
         return result;
 
     } catch (sql::SQLException &e) {
@@ -117,18 +111,15 @@ bool SessionQuery::isDoctor(string sid) {
     }
 }
 
-bool SessionQuery::isReceptionist(string sid) {
+bool SessionQuery::isReceptionist(const std::string& sid) {
     try {
-        sql::ResultSet *queryResult;
-        string queryString;
-        queryString.append("select * from user where id in (select user_id_fk from session where session_id = '");
-        queryString.append(sid);
-        queryString.append("') and expert_id_fk is null;");
-
-        queryResult = stmt->executeQuery(queryString);
+        stringstream queryString;
+        queryString << "select * from user where id in (select user_id_fk from session where session_id = '";
+        queryString << sid;
+        queryString << "') and expert_id_fk is null;";
+        shared_ptr<sql::ResultSet> queryResult(stmt->executeQuery(queryString.str()));
         bool result = false;
         if (queryResult->next()) result = true;
-        delete queryResult;
         return result;
 
     } catch (sql::SQLException &e) {

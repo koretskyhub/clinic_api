@@ -1,5 +1,7 @@
 #include "clinic.h"
 
+using namespace std;
+
 int main(int argc, char **argv) {
     try {
         cppcms::service srv(argc, argv);

@@ -9,9 +9,8 @@
 
 class TimetableQuery : public dbQuery {
 public:
-    cppcms::json::value specialistsByDate(string date, string specId);
-
-    void createAppointment(string dateTimeId, string medcardId);
+    cppcms::json::value specialistsByDate(const std::string& date, const std::string& specId);
+    void createAppointment(const std::string& dateTimeId, const std::string& medcardId);
 };
 
 

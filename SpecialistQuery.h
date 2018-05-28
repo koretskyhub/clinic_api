@@ -9,7 +9,7 @@
 
 class SpecialistQuery : public dbQuery {
 public:
-    cppcms::json::value getSecialistsByPos(string id);
+    cppcms::json::value getSecialistsByPos(const std::string& id);
 };
 
 

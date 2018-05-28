@@ -23,13 +23,11 @@
 #include "HistoryQuery.h"
 #include "SurveyQuery.h"
 
-using namespace std;
-
 class Clinic : public cppcms::application {
 public:
     Clinic(cppcms::service &srv) : cppcms::application(srv) {
 
-        const string dateRegexp("(((0[1-9]|[12]\\d|3[01])\\.(0[13578]|1[02])\\.((19|[2-9]\\d)\\d{2})) "
+        const std::string dateRegexp("(((0[1-9]|[12]\\d|3[01])\\.(0[13578]|1[02])\\.((19|[2-9]\\d)\\d{2})) "
                                         "|((0[1-9]|[12]\\d|30)\\.(0[13456789]|1[012])\\.((19|[2-9]\\d)"
                                         "\\d{2}))|((0[1-9]|1\\d|2[0-8])\\.02\\.((19|[2-9]\\d)\\d{2}))|"
                                         "(29\\.02\\.((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|"
@@ -45,7 +43,7 @@ public:
         dispatcher().assign("/position/(\\d+)/specialists",
                             &Clinic::specialistsByPos, this, 1);
 
-        dispatcher().assign(string("/specialists/(\\d+)/timetable/").append(dateRegexp),
+        dispatcher().assign(std::string("/specialists/(\\d+)/timetable/").append(dateRegexp),
                             &Clinic::specialistsByDate, this, 1, 2);
 
         dispatcher().assign("/timetable/(\\d+)/medcard/(\\d+)",
@@ -86,23 +84,23 @@ public:
 
     void specializations();
 
-    void posBySpecilazation(const string specializationId);
+    void posBySpecilazation(const std::string specializationId);
 
-    void specialistsByPos(const string positionId);
+    void specialistsByPos(const std::string positionId);
 
-    void specialistsByDate(const string num, const string date);
+    void specialistsByDate(const std::string num, const std::string date);
 
-    void newTimetableEntry(const string timeId, const string medcardId);
+    void newTimetableEntry(const std::string timeId, const std::string medcardId);
 
     void getOrCreatePatient();
 
     void todayPatients();
 
-    void medcardMeta(const string medcardId);
+    void medcardMeta(const std::string medcardId);
 
-    void medcardHistory(const string medcardId);
+    void medcardHistory(const std::string medcardId);
 
-    void medcardSurvey(const string medcardId);
+    void medcardSurvey(const std::string medcardId);
 
     void newSurvey();
 
@@ -112,13 +110,13 @@ public:
 
     void logout();
 
-    bool isDoctor(const string sid) const;
+    bool isDoctor(const std::string sid) const;
 
-    bool isReceptionist(const string sid) const;
+    bool isReceptionist(const std::string sid) const;
 
-    string generate_sid();
+    std::string generate_sid();
 
-    string getClientSid();
+    std::string getClientSid();
 
 };
 

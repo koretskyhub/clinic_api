@@ -1,5 +1,6 @@
 #include "clinic.h"
 
+using namespace std;
 
 void Clinic::specializations() {
     if (isReceptionist(getClientSid())) {

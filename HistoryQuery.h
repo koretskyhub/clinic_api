@@ -10,8 +10,8 @@
 class HistoryQuery : dbQuery {
 public:
 
-    void createHistoryRecord(const cppcms::json::value &newRecord, const string sid);
-    cppcms::json::value getHistoryRecord(const string medcardId, const string page);
+    void createHistoryRecord(const cppcms::json::value &newRecord, const std::string& sid);
+    cppcms::json::value getHistoryRecord(const std::string& medcardId, const std::string& page);
 };
 
 

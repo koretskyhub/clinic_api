@@ -13,11 +13,11 @@ public:
 
     bool createPatient(const cppcms::json::value &newPatient);
 
-    cppcms::json::value getPatientBySecondName(const string secondName);
+    cppcms::json::value getPatientBySecondName(const std::string& secondName);
 
-    cppcms::json::value getPatientById(const string id);
+    cppcms::json::value getPatientById(const std::string& id);
 
-    cppcms::json::value todayPatients(const string sid);
+    cppcms::json::value todayPatients(const std::string& sid);
 
 };
 

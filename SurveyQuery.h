@@ -10,9 +10,9 @@
 class SurveyQuery : dbQuery {
 public:
 
-    void createSurveyRecord(cppcms::json::value &newRecord, string sid);
+    void createSurveyRecord(cppcms::json::value &newRecord, const std::string& sid);
 
-    cppcms::json::value getSurveyRecord(string medcardId, string page);
+    cppcms::json::value getSurveyRecord(const std::string& medcardId, const std::string& page);
 };
 
 

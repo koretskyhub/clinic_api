@@ -2,26 +2,25 @@
 // Created by mike on 17.05.18.
 //
 
+#include <sstream>
 #include "SurveyQuery.h"
 
 using namespace std;
 
-cppcms::json::value SurveyQuery::getSurveyRecord(string medcardId, string page) {
+cppcms::json::value SurveyQuery::getSurveyRecord(const string& medcardId, const string& page) {
     try {
 
-        sql::ResultSet *queryResult;
-        string queryString;
-        queryString.append("select pos_name, expert_id_fk, first_name, second_name,"
+        stringstream queryString;
+        queryString << "select pos_name, expert_id_fk, first_name, second_name,"
                                    " middle_name, survey_type, results,"
                                    " date_format(receipt_date, '%d.%m.%Y')"
                                    " as date from survey, expert,position"
                                    " where expert.id = survey.expert_id_fk"
-                                   " and survey.medcard_id_fk = ");
-        queryString.append(medcardId);
-        queryString.append(" and position.id = expert.pos_id_fk;");
-
-        queryResult = stmt->executeQuery(queryString);
-        const int pageSize = 5;
+                                   " and survey.medcard_id_fk = ";
+        queryString << medcardId;
+        queryString << " and position.id = expert.pos_id_fk;";
+        shared_ptr<sql::ResultSet> queryResult(stmt->executeQuery(queryString.str()));
+        const int pageSize = 5; //Количество записей в формируемом Json-ответе, регулирует его размер
         int count = 0;
         int pag = stoi(page);
         int currpage = 0;
@@ -47,7 +46,6 @@ cppcms::json::value SurveyQuery::getSurveyRecord(string medcardId, string page) 
         jsonResponse["current_page"] =  pag;
         jsonResponse["next_page"] =     (count_pages >= pag) ? pag : pag + 1;
         jsonResponse["prev_page"] =     (pag > 0) ? pag - 1 : pag;
-        delete queryResult;
         return jsonResponse;
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;
@@ -58,22 +56,22 @@ cppcms::json::value SurveyQuery::getSurveyRecord(string medcardId, string page) 
     }
 }
 
-void SurveyQuery::createSurveyRecord(cppcms::json::value &newRecord, string sid) {
+void SurveyQuery::createSurveyRecord(cppcms::json::value &newRecord, const string& sid) {
     try {
 
-        string queryString;
-        queryString.append("insert into survey values (null, (select expert_id_fk from user,"
-                                   " session where session.session_id = '");
-        queryString.append(sid);
-        queryString.append("' and session.user_id_fk = user.id), ");
-        queryString.append(newRecord["medcard_id"].str());
-        queryString.append(", '");
-        queryString.append(newRecord["type_of_survey"].str());
-        queryString.append("', '");
-        queryString.append(newRecord["result"].str());
-        queryString.append("', date(now()));");
+        stringstream queryString;
+        queryString << "insert into survey values (null, (select expert_id_fk from user,"
+                                   " session where session.session_id = '";
+        queryString << sid;
+        queryString << "' and session.user_id_fk = user.id), ";
+        queryString << newRecord["medcard_id"].str();
+        queryString << ", '";
+        queryString << newRecord["type_of_survey"].str();
+        queryString << "', '";
+        queryString << newRecord["result"].str();
+        queryString << "', date(now()));";
 
-        stmt->execute(queryString);
+        stmt->execute(queryString.str());
 
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;
